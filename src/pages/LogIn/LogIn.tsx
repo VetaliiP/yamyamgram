@@ -5,19 +5,19 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, TextField, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-// Схема валидации для регистрации
+// Схема валидации для входа
 const schema = yup.object({
-    username: yup.string().required('Имя обязательно').min(3, 'Минимум 3 символа'),
+    username: yup.string().required('Имя пользователя обязательно').min(3, 'Минимум 3 символа'),
     password: yup.string().required('Пароль обязателен').min(6, 'Минимум 6 символов'),
 });
 
 type FormData = yup.InferType<typeof schema>;
 
-interface FormPageProps {
+interface LoginPageProps {
     setAuthenticated: (auth: boolean) => void;
 }
 
-const FormPage = ({ setAuthenticated }: FormPageProps) => {
+const LoginPage = ({ setAuthenticated }: LoginPageProps) => {
     const {
         register,
         handleSubmit,
@@ -31,29 +31,26 @@ const FormPage = ({ setAuthenticated }: FormPageProps) => {
     const onSubmit = (data: FormData) => {
         const { username, password } = data;
 
-        // Проверяем, есть ли уже такой пользователь в localStorage
+        // Проверяем, есть ли такой пользователь в localStorage
         const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-        const userExists = storedUsers.some((user: { username: string }) => user.username === username);
+        const user = storedUsers.find((user: { username: string, password: string }) =>
+            user.username === username && user.password === password
+        );
 
-        if (userExists) {
-            alert('Пользователь с таким именем уже существует.');
-        } else {
-            // Добавляем нового пользователя в localStorage
-            storedUsers.push({ username, password });
-            localStorage.setItem('users', JSON.stringify(storedUsers));
-
-            // Сохраняем авторизацию в localStorage
+        if (user) {
+            // Если пользователь найден, сохраняем авторизацию и перенаправляем
             localStorage.setItem('auth', 'true');
             setAuthenticated(true);
-
-            // Перенаправляем на страницу Home
             navigate('/');
+        } else {
+            // Если пользователь не найден, выводим ошибку
+            alert('Неверное имя пользователя или пароль');
         }
     };
 
     return (
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="h5">Регистрация / Вход</Typography>
+            <Typography variant="h5">Вход</Typography>
 
             <TextField
                 label="Имя пользователя"
@@ -77,4 +74,4 @@ const FormPage = ({ setAuthenticated }: FormPageProps) => {
     );
 };
 
-export default FormPage;
+export default LoginPage;

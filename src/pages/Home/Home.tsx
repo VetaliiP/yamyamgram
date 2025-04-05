@@ -1,13 +1,20 @@
-import React, { FC } from 'react';
-import { Box, Typography } from '@mui/material';
+import React from 'react';
+import { Typography, Button } from '@mui/material';
 
-const Home: FC = () => {
+const Home = () => {
+    const handleLogout = () => {
+        localStorage.removeItem('auth');
+        window.location.reload();  // Перезагружаем страницу, чтобы сбросить состояние
+    };
+
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div>
             <Typography variant="h4">Добро пожаловать на главную страницу!</Typography>
-        </Box>
-    )
-}
+            <Button onClick={handleLogout} variant="contained" color="secondary">
+                Выйти
+            </Button>
+        </div>
+    );
+};
 
 export default Home;
-
